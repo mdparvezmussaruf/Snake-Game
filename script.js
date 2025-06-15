@@ -7,8 +7,14 @@ const columns = canvas.width / scale;
 let snake;
 let food;
 let score = 0;
+let speed = 150;
+let intervalId;
 
-// === ENHANCEMENT: Rounded rectangle for snake segments ===
+// Load sounds
+const eatSound = new Audio("eat.mp3");
+const crashSound = new Audio("crash.mp3");
+
+// Rounded rectangle polyfill
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, radius) {
   this.beginPath();
   this.moveTo(x + radius, y);
@@ -19,36 +25,48 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, ra
   this.closePath();
 };
 
-// === GAME SETUP ===
-(function setup() {
+// Start Game
+function setup() {
   snake = new Snake();
   food = randomFood();
-  window.setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    food.draw();
-    snake.update();
-    snake.draw();
+  score = 0;
+  speed = 150;
+  document.getElementById("score").innerText = score;
 
-    if (snake.eat(food)) {
-      food = randomFood();
-      score++;
-      document.getElementById("score").innerText = score;
+  if (intervalId) clearInterval(intervalId);
+  intervalId = window.setInterval(gameLoop, speed);
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  food.draw();
+  snake.update();
+  snake.draw();
+
+  if (snake.eat(food)) {
+    food = randomFood();
+    eatSound.play();
+    score++;
+    document.getElementById("score").innerText = score;
+
+    // Increase speed every 5 points
+    if (score % 5 === 0 && speed > 50) {
+      speed -= 10;
+      clearInterval(intervalId);
+      intervalId = setInterval(gameLoop, speed);
     }
+  }
 
-    snake.checkCollision();
-  }, 150);
-})();
+  snake.checkCollision();
+}
 
-// === FOOD GENERATOR ===
 function randomFood() {
   let food = new Food();
   food.pickLocation();
   return food;
 }
 
-// === INPUT CONTROL (ORIGINAL + ENHANCED) ===
 document.addEventListener("keydown", keyDown);
-
 function keyDown(evt) {
   const key = evt.key.toLowerCase();
   switch (key) {
@@ -71,13 +89,41 @@ function keyDown(evt) {
   }
 }
 
-// === SNAKE CLASS ===
+// Touch screen support
+let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener("touchstart", function(e) {
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+});
+
+canvas.addEventListener("touchend", function(e) {
+  const touch = e.changedTouches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 0 && snake.xSpeed === 0) {
+      snake.xSpeed = 1; snake.ySpeed = 0;
+    } else if (dx < 0 && snake.xSpeed === 0) {
+      snake.xSpeed = -1; snake.ySpeed = 0;
+    }
+  } else {
+    if (dy > 0 && snake.ySpeed === 0) {
+      snake.ySpeed = 1; snake.xSpeed = 0;
+    } else if (dy < 0 && snake.ySpeed === 0) {
+      snake.ySpeed = -1; snake.xSpeed = 0;
+    }
+  }
+});
+
 function Snake() {
   this.body = [{ x: 5, y: 5 }];
   this.xSpeed = 1;
   this.ySpeed = 0;
 
-  // ENHANCED DRAW METHOD
   this.draw = function () {
     ctx.fillStyle = "#43a047";
     ctx.strokeStyle = "#2e7d32";
@@ -100,10 +146,6 @@ function Snake() {
     this.body.pop();
   };
 
-  this.changeDirection = function (direction) {
-    // Not used anymore, replaced by keyDown()
-  };
-
   this.eat = function (food) {
     return this.body[0].x === food.x && this.body[0].y === food.y;
   };
@@ -112,18 +154,18 @@ function Snake() {
     const head = this.body[0];
     for (let i = 1; i < this.body.length; i++) {
       if (head.x === this.body[i].x && head.y === this.body[i].y) {
-        alert("Game Over");
-        document.location.reload();
+        crashSound.play();
+        endGame();
+        return;
       }
     }
     if (head.x < 0 || head.y < 0 || head.x >= columns || head.y >= rows) {
-      alert("Game Over");
-      document.location.reload();
+      crashSound.play();
+      endGame();
     }
   };
 }
 
-// === FOOD CLASS ===
 function Food() {
   this.x;
   this.y;
@@ -133,7 +175,6 @@ function Food() {
     this.y = Math.floor(Math.random() * rows);
   };
 
-  // ENHANCED DRAW METHOD
   this.draw = function () {
     const x = this.x * scale + scale / 2;
     const y = this.y * scale + scale / 2;
@@ -145,6 +186,20 @@ function Food() {
     ctx.shadowColor = "#ef5350";
     ctx.shadowBlur = 10;
     ctx.fill();
-    ctx.shadowBlur = 0; // reset
+    ctx.shadowBlur = 0;
   };
 }
+
+// === Game Over UI Handling ===
+function endGame() {
+  clearInterval(intervalId);
+  document.getElementById("gameOverScreen").style.display = "block";
+}
+
+function restartGame() {
+  document.getElementById("gameOverScreen").style.display = "none";
+  setup();
+}
+
+// Start the game
+setup();
