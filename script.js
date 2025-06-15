@@ -124,19 +124,26 @@ function Snake() {
   this.xSpeed = 1;
   this.ySpeed = 0;
 
-  this.draw = function () {
-    ctx.fillStyle = "#43a047";
-    ctx.strokeStyle = "#2e7d32";
-    ctx.lineJoin = "round";
-    ctx.lineWidth = 1;
+ // Load snake images
+const headImg = new Image();
+headImg.src = "snake-head.png";
+const bodyImg = new Image();
+bodyImg.src = "snake-body.png";
 
-    this.body.forEach(segment => {
-      ctx.beginPath();
-      ctx.roundRect(segment.x * scale, segment.y * scale, scale, scale, 5);
-      ctx.fill();
-      ctx.stroke();
-    });
-  };
+this.draw = function () {
+  this.body.forEach((segment, index) => {
+    const x = segment.x * scale;
+    const y = segment.y * scale;
+
+    if (index === 0) {
+      // Draw head
+      ctx.drawImage(headImg, x, y, scale, scale);
+    } else {
+      // Draw body
+      ctx.drawImage(bodyImg, x, y, scale, scale);
+    }
+  });
+};
 
   this.update = function () {
     const head = { ...this.body[0] };
