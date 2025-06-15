@@ -1,9 +1,23 @@
 body {
   text-align: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f0f0;
+}
+
+h1 {
+  color: #333;
+  margin-top: 20px;
 }
 
 canvas {
-  border: 2px solid #333;
-  background: #fafafa;
+  border: 4px solid #222;
+  background: radial-gradient(#e8f5e9, #c8e6c9);
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  margin-top: 20px;
+}
+
+#score {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #2e7d32;
 }
