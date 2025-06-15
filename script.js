@@ -8,8 +8,18 @@ let snake;
 let food;
 let score = 0;
 
-document.addEventListener("keydown", keyDown);
+// === ENHANCEMENT: Rounded rectangle for snake segments ===
+CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, radius) {
+  this.beginPath();
+  this.moveTo(x + radius, y);
+  this.arcTo(x + width, y, x + width, y + height, radius);
+  this.arcTo(x + width, y + height, x, y + height, radius);
+  this.arcTo(x, y + height, x, y, radius);
+  this.arcTo(x, y, x + width, y, radius);
+  this.closePath();
+};
 
+// === GAME SETUP ===
 (function setup() {
   snake = new Snake();
   food = randomFood();
@@ -29,51 +39,76 @@ document.addEventListener("keydown", keyDown);
   }, 150);
 })();
 
+// === FOOD GENERATOR ===
 function randomFood() {
   let food = new Food();
   food.pickLocation();
   return food;
 }
 
+// === INPUT CONTROL (ORIGINAL + ENHANCED) ===
+document.addEventListener("keydown", keyDown);
+
 function keyDown(evt) {
-  const direction = evt.key.replace("Arrow", "");
-  snake.changeDirection(direction);
+  const key = evt.key.toLowerCase();
+  switch (key) {
+    case "arrowup":
+    case "w":
+      if (snake.ySpeed === 0) { snake.xSpeed = 0; snake.ySpeed = -1; }
+      break;
+    case "arrowdown":
+    case "s":
+      if (snake.ySpeed === 0) { snake.xSpeed = 0; snake.ySpeed = 1; }
+      break;
+    case "arrowleft":
+    case "a":
+      if (snake.xSpeed === 0) { snake.xSpeed = -1; snake.ySpeed = 0; }
+      break;
+    case "arrowright":
+    case "d":
+      if (snake.xSpeed === 0) { snake.xSpeed = 1; snake.ySpeed = 0; }
+      break;
+  }
 }
 
+// === SNAKE CLASS ===
 function Snake() {
-  this.body = [{x: 5, y: 5}];
+  this.body = [{ x: 5, y: 5 }];
   this.xSpeed = 1;
   this.ySpeed = 0;
 
-  this.draw = function() {
-    ctx.fillStyle = "#00cc66";
+  // ENHANCED DRAW METHOD
+  this.draw = function () {
+    ctx.fillStyle = "#43a047";
+    ctx.strokeStyle = "#2e7d32";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 1;
+
     this.body.forEach(segment => {
-      ctx.fillRect(segment.x * scale, segment.y * scale, scale, scale);
+      ctx.beginPath();
+      ctx.roundRect(segment.x * scale, segment.y * scale, scale, scale, 5);
+      ctx.fill();
+      ctx.stroke();
     });
   };
 
-  this.update = function() {
-    const head = {...this.body[0]};
+  this.update = function () {
+    const head = { ...this.body[0] };
     head.x += this.xSpeed;
     head.y += this.ySpeed;
     this.body.unshift(head);
     this.body.pop();
   };
 
-  this.changeDirection = function(direction) {
-    switch(direction) {
-      case "Up": if (this.ySpeed === 0) { this.xSpeed = 0; this.ySpeed = -1; } break;
-      case "Down": if (this.ySpeed === 0) { this.xSpeed = 0; this.ySpeed = 1; } break;
-      case "Left": if (this.xSpeed === 0) { this.xSpeed = -1; this.ySpeed = 0; } break;
-      case "Right": if (this.xSpeed === 0) { this.xSpeed = 1; this.ySpeed = 0; } break;
-    }
+  this.changeDirection = function (direction) {
+    // Not used anymore, replaced by keyDown()
   };
 
-  this.eat = function(food) {
+  this.eat = function (food) {
     return this.body[0].x === food.x && this.body[0].y === food.y;
   };
 
-  this.checkCollision = function() {
+  this.checkCollision = function () {
     const head = this.body[0];
     for (let i = 1; i < this.body.length; i++) {
       if (head.x === this.body[i].x && head.y === this.body[i].y) {
@@ -88,17 +123,28 @@ function Snake() {
   };
 }
 
+// === FOOD CLASS ===
 function Food() {
   this.x;
   this.y;
 
-  this.pickLocation = function() {
+  this.pickLocation = function () {
     this.x = Math.floor(Math.random() * columns);
     this.y = Math.floor(Math.random() * rows);
   };
 
-  this.draw = function() {
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
+  // ENHANCED DRAW METHOD
+  this.draw = function () {
+    const x = this.x * scale + scale / 2;
+    const y = this.y * scale + scale / 2;
+    const radius = scale / 2.5;
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = "#e53935";
+    ctx.shadowColor = "#ef5350";
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0; // reset
   };
 }
