@@ -190,7 +190,6 @@ function Food() {
   };
 }
 
-// === Game Over UI Handling ===
 function endGame() {
   clearInterval(intervalId);
   document.getElementById("gameOverScreen").style.display = "block";
