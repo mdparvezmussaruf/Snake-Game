@@ -126,9 +126,9 @@ function Snake() {
 
  // Load snake images
 const headImg = new Image();
-headImg.src = "snake-head.png";
+headImg.src = "./snake-head.png";
 const bodyImg = new Image();
-bodyImg.src = "snake-body.png";
+bodyImg.src = "./snake-body.png";
 
 this.draw = function () {
   this.body.forEach((segment, index) => {
