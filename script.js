@@ -143,6 +143,7 @@ function Snake() {
   this.xSpeed = 1;
   this.ySpeed = 0;
   this.lastDirection = "right";
+  this.justAte = false;
 
   const headImg = new Image();
   headImg.src = "snake-head.png";
@@ -162,11 +163,17 @@ function Snake() {
     head.x += this.xSpeed;
     head.y += this.ySpeed;
     this.body.unshift(head);
-    this.body.pop();
+    if (!this.justAte) {
+      this.body.pop();
+    } else {
+      this.justAte = false;
+    }
   };
 
   this.eat = function (food) {
-    return this.body[0].x === food.x && this.body[0].y === food.y;
+    const didEat = this.body[0].x === food.x && this.body[0].y === food.y;
+    if (didEat) this.justAte = true;
+    return didEat;
   };
 
   this.checkCollision = function () {
@@ -184,6 +191,7 @@ function Snake() {
     }
   };
 }
+
 
 function Food() {
   this.x;
