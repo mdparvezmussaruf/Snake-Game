@@ -22,7 +22,7 @@ function setup() {
   snake = new Snake();
   food = randomFood();
   score = 0;
-  speed = 150;
+  speed = 250; // Start slower
   isPaused = false;
 
   document.getElementById("score").innerText = score;
@@ -39,6 +39,7 @@ function gameLoop() {
   food.draw();
   snake.update();
   snake.draw();
+  drawSpeed();
 
   if (snake.eat(food)) {
     food = randomFood();
@@ -52,14 +53,21 @@ function gameLoop() {
       document.getElementById("highScore").innerText = highScore;
     }
 
-    if (score % 5 === 0 && speed > 50) {
-      speed -= 10;
+    if (score % 10 === 0) {
+      speed = Math.max(50, speed + 20);
       clearInterval(intervalId);
       intervalId = setInterval(gameLoop, speed);
     }
   }
 
   snake.checkCollision();
+}
+
+function drawSpeed() {
+  ctx.font = "10px Arial";
+  ctx.fillStyle = "#444";
+  ctx.textAlign = "right";
+  ctx.fillText(`Speed: ${speed}ms`, canvas.width - 2, 10);
 }
 
 function randomFood() {
