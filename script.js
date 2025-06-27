@@ -16,7 +16,6 @@ fruitImg.src = "fruit.png";
 let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("highScore").innerText = highScore;
 
-// Start game
 setup();
 
 function setup() {
@@ -79,29 +78,25 @@ function keyDown(evt) {
   }
 
   switch (key) {
-    case "arrowup":
-    case "w":
+    case "arrowup": case "w":
       if (snake.ySpeed === 0 && snake.lastDirection !== "down") {
         snake.xSpeed = 0; snake.ySpeed = -1;
         snake.lastDirection = "up";
       }
       break;
-    case "arrowdown":
-    case "s":
+    case "arrowdown": case "s":
       if (snake.ySpeed === 0 && snake.lastDirection !== "up") {
         snake.xSpeed = 0; snake.ySpeed = 1;
         snake.lastDirection = "down";
       }
       break;
-    case "arrowleft":
-    case "a":
+    case "arrowleft": case "a":
       if (snake.xSpeed === 0 && snake.lastDirection !== "right") {
         snake.xSpeed = -1; snake.ySpeed = 0;
         snake.lastDirection = "left";
       }
       break;
-    case "arrowright":
-    case "d":
+    case "arrowright": case "d":
       if (snake.xSpeed === 0 && snake.lastDirection !== "left") {
         snake.xSpeed = 1; snake.ySpeed = 0;
         snake.lastDirection = "right";
@@ -111,7 +106,6 @@ function keyDown(evt) {
 }
 document.addEventListener("keydown", keyDown);
 
-// Touch Controls
 let touchStartX = 0, touchStartY = 0;
 canvas.addEventListener("touchstart", e => {
   const touch = e.touches[0];
@@ -139,7 +133,10 @@ canvas.addEventListener("touchend", e => {
 });
 
 function Snake() {
-  this.body = [{ x: 5, y: 5 }];
+  this.body = [
+    { x: 5, y: 5 },
+    { x: 4, y: 5 }
+  ];
   this.xSpeed = 1;
   this.ySpeed = 0;
   this.lastDirection = "right";
@@ -149,12 +146,31 @@ function Snake() {
   headImg.src = "snake-head.png";
   const bodyImg = new Image();
   bodyImg.src = "snake-body.png";
+  const tailImg = new Image();
+  tailImg.src = "snaketail.png";
 
   this.draw = function () {
     this.body.forEach((segment, index) => {
       const x = segment.x * scale;
       const y = segment.y * scale;
-      ctx.drawImage(index === 0 ? headImg : bodyImg, x, y, scale, scale);
+      if (index === 0) {
+        ctx.drawImage(headImg, x, y, scale, scale);
+      } else if (index === this.body.length - 1) {
+        const tail = this.body[this.body.length - 1];
+        const beforeTail = this.body[this.body.length - 2];
+        const dx = tail.x - beforeTail.x;
+        const dy = tail.y - beforeTail.y;
+        ctx.save();
+        ctx.translate(x + scale / 2, y + scale / 2);
+        if (dx === 1) ctx.rotate(Math.PI);
+        else if (dx === -1) ctx.rotate(0);
+        else if (dy === 1) ctx.rotate(-Math.PI / 2);
+        else if (dy === -1) ctx.rotate(Math.PI / 2);
+        ctx.drawImage(tailImg, -scale / 2, -scale / 2, scale, scale);
+        ctx.restore();
+      } else {
+        ctx.drawImage(bodyImg, x, y, scale, scale);
+      }
     });
   };
 
@@ -163,6 +179,7 @@ function Snake() {
     head.x += this.xSpeed;
     head.y += this.ySpeed;
     this.body.unshift(head);
+
     if (!this.justAte) {
       this.body.pop();
     } else {
@@ -191,7 +208,6 @@ function Snake() {
     }
   };
 }
-
 
 function Food() {
   this.x;
