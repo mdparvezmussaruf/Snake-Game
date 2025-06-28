@@ -31,8 +31,6 @@ Welcome to the **Snake Game**, a modern web-based twist on the classic arcade ga
 
 ## 📁 Project Structure
 
-```
-
 Snake-Game/
 │
 ├── index.html           # Main HTML file
