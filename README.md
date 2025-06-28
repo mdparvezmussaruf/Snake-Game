@@ -5,7 +5,7 @@
 
 Welcome to the **Snake Game**, a modern web-based twist on the classic arcade game! Built using HTML, CSS, and JavaScript, this project is lightweight, fast, and fully playable in your browser.
 
-🎮 **Play it now:** [Snake Game Live Demo](https://mdparvezmussaruf.github.io/Snake-Game/)
+🎮 **Play it now:** Snake Game Live Demo: https://mdparvezmussaruf.github.io/Snake-Game/
 
 ---
 
