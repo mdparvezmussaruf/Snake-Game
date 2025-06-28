@@ -7,30 +7,30 @@ Welcome to the **Snake Game**, a modern web-based twist on the classic arcade ga
 
 🎮 **Play it now:** Snake Game Live Demo: https://mdparvezmussaruf.github.io/Snake-Game/
 
----
+````
 
 ## 🚀 Features
-
+```
 - 🟩 Classic snake movement and mechanics
 - 🍎 Fruit collection for score increase
 - 💥 Sound effects for eating and crashing
 - 📱 Responsive design – works on desktop and mobile
 - 🎨 Pixel-styled graphics with smooth animations
 - 🔊 Custom MP3 sounds for immersive gameplay
+````
 
----
 
 ## 🧰 Technologies Used
-
+```
 - **HTML5** – For structured layout
 - **CSS3** – For stylish visuals and responsive UI
 - **JavaScript (Vanilla)** – Core game logic
 - **Audio Files** – MP3s for game feedback
+````
 
----
 
 ## 📁 Project Structure
-
+```
 Snake-Game/
 │
 ├── index.html           # Main HTML file
